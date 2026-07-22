@@ -18,8 +18,30 @@ export function RegisterForm(){
     }
 });
   
- function onSubmit(values: RegisterSchema){
-    console.log(values);
+ async function onSubmit(values: RegisterSchema){
+    const response = await fetch("/api/register", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(values),
+    })
+    const data = await response.json();
+    if (!response.ok) {
+            if (data.error === "Email already exists" || response.status === 409) {
+                form.setError("email", {
+                    type: "server",
+                    message: "Email already exists"
+                });
+            } else{
+                form.setError("root", {
+                    message: data.error || "Что-то пошло не так"
+                });
+            }
+            return;
+        }
+    form.reset();
+    console.log(data);
  }
 
  return (
@@ -45,7 +67,10 @@ export function RegisterForm(){
               <FormItem>
                 <FormLabel>Email</FormLabel>
                 <FormControl>
-                  <Input placeholder="john.doe@example.com" {...field} autoComplete = "email"/>
+                  <Input placeholder="john.doe@example.com" {...field} autoComplete = "email" onChange={(e)=>{
+                    field.onChange(e);
+                    form.clearErrors("email");
+                  }}/>
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -77,6 +102,9 @@ export function RegisterForm(){
               </FormItem>
             )}
           />
+          {form.formState.errors.root && (
+            <p className="text-sm font-medium text-red-500">{form.formState.errors.root.message}</p>
+          )}
           <Button type="submit" className="w-full">Sign Up</Button>
         </form>
     </Form>
