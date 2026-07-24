@@ -4,24 +4,45 @@ import {loginSchema} from "@/lib/loginValidation";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 
+
 export const authConfig = {
     secret: process.env.AUTH_SECRET,
     pages: {
         signIn: "/login",
     },
-    callbacks:{
-        authorized({auth, request: {nextUrl}}){
-            const isLoggedIn = !!auth?.user;
-            const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
-            if (isOnDashboard){
-                if (isLoggedIn) return true;
-                return false;
-            } else if (isLoggedIn){
-                return Response.redirect(new URL("/dashboard", nextUrl));
-            }
-            return true;
-        },
-    },
+    callbacks: {
+  async jwt({ token, user }) {
+    if (user) {
+      token.id = user.id;
+    }
+
+    return token;
+  },
+
+  async session({ session, token }) {
+    if (session.user && token.id) {
+      session.user.id = token.id;
+    }
+
+    return session;
+  },
+
+  authorized({ auth, request: { nextUrl } }) {
+    const isLoggedIn = !!auth?.user;
+    const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
+
+    if (isOnDashboard) {
+      if (isLoggedIn) return true;
+      return false;
+    }
+
+    if (isLoggedIn) {
+      return Response.redirect(new URL("/dashboard", nextUrl));
+    }
+
+    return true;
+  },
+},
    providers: [
     Credentials({
         async authorize(credentials){
