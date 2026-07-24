@@ -6,8 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { loginSchema, type LoginSchema } from "@/lib/loginValidation";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {signIn} from "next-auth/react"
+import { useRouter } from "next/navigation";
 
 export function LoginForm(){
+    const router = useRouter();
     const form = useForm<LoginSchema>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -18,31 +21,29 @@ export function LoginForm(){
   
 
   async function onSubmit(values: LoginSchema){
-      const response = await fetch("/api/login", {
-          method: "POST",
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify(values),
+      const result = await signIn("credentials", {
+         email: values.email,
+         password: values.password,
+         redirect: false,
       })
-      const data = await response.json();
-      if (!response.ok) {
-              if (response.status === 401) {
-                  form.setError("root", {
-                      message: "Invalid email or password",
-                  });
-                  return;
-              } 
-              else{
-                form.setError("root", {
-                message: data.error || "Something went wrong",
-                });
-                return;
-              }
-           
+      
+      if (!result) {
+             form.setError("root", {
+      message: "Something went wrong",
+    });
+    return;
           }
-      form.reset();
-      console.log(data);
+          if (result.error) {
+    form.setError("root", {
+      message: "Invalid email or password",
+    });
+    return;
+  }
+      if (result.ok){
+        form.reset();
+      router.push("/dashboard");
+      router.refresh();
+      }
    }
 
    return (
