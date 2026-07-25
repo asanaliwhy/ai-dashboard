@@ -3,15 +3,20 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { FolderKanban, MessageSquare, Files, HardDrive } from "lucide-react";
 import { RecentWorkspaces } from "@/components/dashboard/RecentWorkspaces";
 import { prisma } from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export default async function DashboardPage() {
   const session = await auth();
+  if (!session?.user) {
+    redirect("/login")
+  }
   const stats = {
     workspaces: 23,
     chats: 1,
     files: 2,
     storage: "3 GB",
   };
+
  const workspaces = await prisma.workspace.findMany({
   where: {
     userId: session!.user.id,
