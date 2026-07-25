@@ -1,4 +1,4 @@
-import { Sidebar } from "./Sidebar";
+import { WorkspaceSidebar } from "@/components/sidebar/WorkspaceSidebar";
 import { Topbar } from "./Topbar";
 
 type DashboardShellProps = {
@@ -8,19 +8,26 @@ type DashboardShellProps = {
     email?: string | null;
     image?: string | null;
   };
+  workspaces: Array<{
+    id: string;
+    name: string;
+    color: string;
+  }>;
 };
 
 export function DashboardShell({
-  children, user
+  children,
+  user,
+  workspaces,
 }: DashboardShellProps) {
   return (
-    <div className="flex min-h-screen bg-background">
-      <Sidebar />
+    <div className="flex h-screen w-screen overflow-hidden bg-background">
+      <WorkspaceSidebar workspaces={workspaces} />
 
-      <div className="flex flex-1 flex-col">
-        <Topbar user={user}/>
+      <div className="flex flex-1 flex-col overflow-hidden">
+        <Topbar user={user} />
 
-        <main className="flex-1 p-6">
+        <main className="flex-1 overflow-y-auto p-6">
           {children}
         </main>
       </div>

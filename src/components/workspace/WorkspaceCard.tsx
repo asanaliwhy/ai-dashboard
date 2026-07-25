@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { EditWorkspaceDialog } from "./EditWorkspaceDialog";
+import { DeleteWorkspaceDialog } from "./DeleteWorkspaceDialog";
 
 type WorkspaceCardProps = {
   workspace: {
@@ -23,13 +24,14 @@ export default function WorkspaceCard({workspace}: WorkspaceCardProps){
         <CardTitle>{workspace.name}</CardTitle>
         <CardDescription>{workspace.description}</CardDescription>
       </CardHeader>
-      <CardContent>
-        <p>{workspace.chatCount} {workspace.chatCount === 1 ? "chat" : "chats"}</p>
-        <p>Updated {workspace.updatedAt}</p>
-        <Button>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-muted-foreground">{workspace.chatCount} {workspace.chatCount === 1 ? "chat" : "chats"}</p>
+        <p className="text-sm text-muted-foreground">Updated {workspace.updatedAt}</p>
+        <Button variant="outline" className="w-full flex gap-2">
             <Link href={`/workspace/${workspace.id}`}>Open</Link>
         </Button>
         <EditWorkspaceDialog workspace={workspace}  />
+        <DeleteWorkspaceDialog workspaceId={workspace.id} workspaceName={workspace.name} />
       </CardContent>
     </Card>
   );
