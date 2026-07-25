@@ -7,11 +7,9 @@ import {
   FolderKanban,
   Settings,
   User,
-  Plus,
-  MessageSquare,
   Search,
+  Sparkles,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { CreateWorkspaceDialog } from "@/components/workspace/CreateWorkspaceDialog";
@@ -40,46 +38,50 @@ export function WorkspaceSidebar({ workspaces }: WorkspaceSidebarProps) {
 
   return (
     <>
-      <aside className="flex h-full w-60 flex-col gap-4 border-r bg-card p-4">
-        {/* Logo & App title */}
+      <aside className="flex h-full w-64 flex-col gap-4 border-r border-border/60 bg-card/60 p-4 backdrop-blur-md shrink-0">
+        {/* Brand Logo */}
         <div className="flex items-center justify-between px-2 py-1">
-          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg tracking-tight">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <MessageSquare className="h-4 w-4" />
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2.5 font-bold text-base tracking-tight text-foreground"
+          >
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-xs">
+              <Sparkles className="h-4.5 w-4.5" />
             </div>
-            AI Workspace
+            <span>AI Workspace</span>
           </Link>
         </div>
 
-        {/* Search trigger */}
-        <Button
-          variant="outline"
-          size="sm"
-          className="w-full justify-start gap-2 text-muted-foreground font-normal text-xs h-9"
+        {/* Search trigger button */}
+        <button
+          type="button"
+          className="w-full flex items-center gap-2 text-muted-foreground text-xs h-9 px-3 rounded-lg border border-border/60 bg-background/50 hover:bg-accent transition-colors cursor-pointer"
           onClick={() => setSearchOpen(true)}
         >
           <Search className="h-3.5 w-3.5" />
           <span>Search chats...</span>
           <kbd className="ml-auto pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground opacity-100">
-            <span className="text-xs">⌘</span>K
+            ⌘K
           </kbd>
-        </Button>
+        </button>
 
         {/* Main Nav */}
         <nav className="space-y-1">
           {mainNav.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/dashboard" && pathname.startsWith(item.href + "/"));
 
             return (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                  "flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-150 cursor-pointer",
                   isActive
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                    ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                    : "text-muted-foreground hover:bg-accent hover:text-foreground"
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -89,34 +91,35 @@ export function WorkspaceSidebar({ workspaces }: WorkspaceSidebarProps) {
           })}
         </nav>
 
-        <div className="my-1 border-t" />
+        <div className="my-1 border-t border-border/40" />
 
-        {/* Workspaces list */}
+        {/* Workspaces Section */}
         <div className="flex flex-1 flex-col overflow-hidden">
-          <div className="flex items-center justify-between px-2 py-1">
-            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-              Workspaces
+          <div className="flex items-center justify-between px-2 py-1 mb-1">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+              Workspaces ({workspaces.length})
             </span>
-            <CreateWorkspaceDialog />
+            <CreateWorkspaceDialog iconOnly />
           </div>
 
-          <div className="mt-2 flex-1 space-y-1 overflow-y-auto pr-1">
+          <div className="flex-1 space-y-1 overflow-y-auto pr-1">
             {workspaces.map((ws) => {
-              const isActive = pathname.startsWith(`/workspace/${ws.id}`);
+              const href = `/workspace/${ws.id}`;
+              const isActive = pathname.startsWith(href);
 
               return (
                 <Link
                   key={ws.id}
-                  href={`/workspace/${ws.id}`}
+                  href={href}
                   className={cn(
-                    "flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors",
+                    "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors cursor-pointer",
                     isActive
                       ? "bg-accent text-accent-foreground font-semibold"
                       : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
                   )}
                 >
                   <div
-                    className="h-3 w-3 rounded-full shrink-0"
+                    className="h-2.5 w-2.5 rounded-full shrink-0 shadow-xs"
                     style={{ backgroundColor: ws.color }}
                   />
                   <span className="truncate">{ws.name}</span>

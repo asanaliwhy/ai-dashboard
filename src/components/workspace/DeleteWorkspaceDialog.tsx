@@ -2,25 +2,46 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {AlertDialog,AlertDialogAction,AlertDialogCancel,AlertDialogContent,AlertDialogDescription,AlertDialogFooter,AlertDialogHeader,AlertDialogTitle,AlertDialogTrigger,} from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { usePathname } from "next/navigation";
 
-
 type DeleteWorkspaceDialogProps = {
   workspaceId: string;
   workspaceName: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  onSuccess?: () => void;
 };
 
 export function DeleteWorkspaceDialog({
   workspaceId,
   workspaceName,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  onSuccess,
 }: DeleteWorkspaceDialogProps) {
   const pathname = usePathname();
   const router = useRouter();
+  const [internalOpen, setInternalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const isControlled = controlledOpen !== undefined;
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = isControlled
+    ? controlledOnOpenChange || (() => {})
+    : setInternalOpen;
 
   async function handleDelete() {
     try {
@@ -38,6 +59,8 @@ export function DeleteWorkspaceDialog({
       }
 
       toast.success("Workspace deleted");
+      setOpen(false);
+      onSuccess?.();
 
       if (pathname === `/workspace/${workspaceId}`) {
         router.push("/workspace");
@@ -52,35 +75,29 @@ export function DeleteWorkspaceDialog({
   }
 
   return (
-    <AlertDialog>
-      <AlertDialogTrigger>
-        <Button type="button" variant="destructive" size="icon">
+    <AlertDialog open={open} onOpenChange={setOpen}>
+      {!isControlled && (
+        <AlertDialogTrigger
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-destructive/10 text-destructive hover:bg-destructive/20 transition-colors cursor-pointer"
+        >
           <Trash2 className="h-4 w-4" />
-        </Button>
-      </AlertDialogTrigger>
+        </AlertDialogTrigger>
+      )}
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Delete workspace?
-          </AlertDialogTitle>
+          <AlertDialogTitle>Delete workspace?</AlertDialogTitle>
 
           <AlertDialogDescription>
-            This will permanently delete{" "}
-            <strong>{workspaceName}</strong> and all of its chats.
-            This action cannot be undone.
+            This will permanently delete <strong>{workspaceName}</strong> and
+            all of its chats. This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={loading}>
-            Cancel
-          </AlertDialogCancel>
+          <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
 
-          <AlertDialogAction
-            onClick={handleDelete}
-            disabled={loading}
-          >
+          <AlertDialogAction onClick={handleDelete} disabled={loading}>
             {loading ? "Deleting..." : "Delete"}
           </AlertDialogAction>
         </AlertDialogFooter>

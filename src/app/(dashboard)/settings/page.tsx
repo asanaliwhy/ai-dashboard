@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Moon, Sun, Laptop, Save, Loader2 } from "lucide-react";
+import { Moon, Sun, Laptop, Save, Loader2, Sparkles, SlidersHorizontal, Bell } from "lucide-react";
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -80,28 +80,40 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+        <div className="flex items-center gap-2 text-primary font-medium text-xs tracking-wider uppercase mb-1">
+          <SlidersHorizontal className="h-4 w-4" /> Preferences
+        </div>
+        <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          Settings
+        </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage your AI Workspace preferences and configuration.
+          Manage your default AI model options, interface theme, and notification preferences.
         </p>
       </div>
 
       <div className="space-y-6">
         {/* AI Model Preferences */}
-        <Card>
-          <CardHeader>
-            <CardTitle>AI Preferences</CardTitle>
-            <CardDescription>
-              Choose default models for your workspace conversations.
+        <Card className="border border-border/60 bg-card p-6 shadow-xs">
+          <CardHeader className="p-0 pb-4">
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" /> AI Model Preferences
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Choose the default model automatically assigned to new workspace conversations.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-0 pt-2">
             <div className="space-y-2 max-w-md">
-              <Label htmlFor="default-model">Default AI Model</Label>
-              <Select value={defaultModel} onValueChange={(val) => val && setDefaultModel(val)}>
-                <SelectTrigger id="default-model">
+              <Label htmlFor="default-model" className="text-xs font-semibold">
+                Default AI Model
+              </Label>
+              <Select
+                value={defaultModel}
+                onValueChange={(val) => val && setDefaultModel(val)}
+              >
+                <SelectTrigger id="default-model" className="h-10">
                   <SelectValue placeholder="Select Model" />
                 </SelectTrigger>
                 <SelectContent>
@@ -116,23 +128,23 @@ export default function SettingsPage() {
           </CardContent>
         </Card>
 
-        {/* Appearance */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Appearance</CardTitle>
-            <CardDescription>
-              Customize how AI Workspace looks on your screen.
+        {/* Appearance Theme */}
+        <Card className="border border-border/60 bg-card p-6 shadow-xs">
+          <CardHeader className="p-0 pb-4">
+            <CardTitle className="text-lg font-bold">Appearance</CardTitle>
+            <CardDescription className="text-xs">
+              Select your preferred color mode for the AI Workspace interface.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-0 pt-2">
             <div className="grid grid-cols-3 gap-4 max-w-md">
               <button
                 type="button"
                 onClick={() => handleThemeChange("LIGHT")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                   theme === "LIGHT"
-                    ? "border-primary bg-primary/5 text-primary font-semibold"
-                    : "border-border hover:bg-accent"
+                    ? "border-primary bg-primary/5 text-primary font-semibold shadow-xs"
+                    : "border-border/60 hover:bg-accent hover:border-border text-muted-foreground"
                 }`}
               >
                 <Sun className="h-5 w-5" />
@@ -142,10 +154,10 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => handleThemeChange("DARK")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                   theme === "DARK"
-                    ? "border-primary bg-primary/5 text-primary font-semibold"
-                    : "border-border hover:bg-accent"
+                    ? "border-primary bg-primary/5 text-primary font-semibold shadow-xs"
+                    : "border-border/60 hover:bg-accent hover:border-border text-muted-foreground"
                 }`}
               >
                 <Moon className="h-5 w-5" />
@@ -155,10 +167,10 @@ export default function SettingsPage() {
               <button
                 type="button"
                 onClick={() => handleThemeChange("SYSTEM")}
-                className={`flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
+                className={`flex flex-col items-center justify-center gap-2 p-4 rounded-2xl border-2 transition-all ${
                   theme === "SYSTEM"
-                    ? "border-primary bg-primary/5 text-primary font-semibold"
-                    : "border-border hover:bg-accent"
+                    ? "border-primary bg-primary/5 text-primary font-semibold shadow-xs"
+                    : "border-border/60 hover:bg-accent hover:border-border text-muted-foreground"
                 }`}
               >
                 <Laptop className="h-5 w-5" />
@@ -169,17 +181,19 @@ export default function SettingsPage() {
         </Card>
 
         {/* Notifications */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Notifications</CardTitle>
-            <CardDescription>
-              Manage how you receive updates and summaries.
+        <Card className="border border-border/60 bg-card p-6 shadow-xs">
+          <CardHeader className="p-0 pb-4">
+            <CardTitle className="text-lg font-bold flex items-center gap-2">
+              <Bell className="h-4 w-4 text-primary" /> Notifications
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Manage system updates and workspace alerts.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="p-0 pt-2">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">Email Notifications</p>
+                <p className="text-sm font-medium text-foreground">Email Notifications</p>
                 <p className="text-xs text-muted-foreground">
                   Receive activity summaries and system updates.
                 </p>
@@ -188,14 +202,18 @@ export default function SettingsPage() {
                 type="checkbox"
                 checked={emailNotifications}
                 onChange={(e) => setEmailNotifications(e.target.checked)}
-                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                className="h-4 w-4 rounded border-border text-primary focus:ring-primary accent-primary"
               />
             </div>
           </CardContent>
         </Card>
 
-        <div className="flex justify-end">
-          <Button onClick={handleSave} disabled={saving} className="gap-2">
+        <div className="flex justify-end pt-2">
+          <Button
+            onClick={handleSave}
+            disabled={saving}
+            className="gap-2 h-10 px-6 rounded-xl font-medium"
+          >
             {saving ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (

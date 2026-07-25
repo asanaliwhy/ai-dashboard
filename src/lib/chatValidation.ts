@@ -1,6 +1,12 @@
 import { z } from "zod";
 
-export const AI_MODELS = ["Llama 3.3", "GPT OSS 120B"] as const;
+export const AI_MODELS = [
+  "Llama 3.3",
+  "Llama 3.1 8B",
+  "Mixtral 8x7B",
+  "DeepSeek R1 70B",
+  "GPT OSS 120B",
+] as const;
 
 export const createChatSchema = z.object({
   title: z
@@ -24,7 +30,6 @@ export const updateChatSchema = z.object({
   aiModel: z.enum(AI_MODELS),
 });
 
-// Keep backward-compatible export for create usage
 export const chatSchema = createChatSchema;
 
 export type CreateChatSchema = z.infer<typeof createChatSchema>;

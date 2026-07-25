@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import { StatsCard } from "@/components/dashboard/StatsCard";
-import { FolderKanban, MessageSquare, Files, HardDrive } from "lucide-react";
+import { FolderKanban, MessageSquare, Files, HardDrive, Sparkles } from "lucide-react";
 import { RecentWorkspaces } from "@/components/dashboard/RecentWorkspaces";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
@@ -47,53 +47,53 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex-1 space-y-8 p-6 md:p-8 max-w-7xl mx-auto">
-      <div className="flex flex-col gap-1">
+      {/* Welcome Header */}
+      <div className="flex flex-col gap-1.5">
+        <div className="flex items-center gap-2 text-primary font-medium text-xs tracking-wider uppercase">
+          <Sparkles className="h-3.5 w-3.5" /> Workspace Hub
+        </div>
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Welcome back, {session.user.name}
+          Welcome back, {session.user.name || "User"}
         </h1>
         <p className="text-sm text-muted-foreground">
-          Manage your AI workspaces and recent activities here.
+          Manage your AI workspaces, conversations, and document context.
         </p>
       </div>
 
+      {/* Overview Stats Cards */}
       <div className="grid gap-4 sm:gap-6 md:grid-cols-2 xl:grid-cols-4">
         <StatsCard
           title="Workspaces"
           value={workspaceCount}
-          description="Total workspaces"
-          icon={<FolderKanban className="h-6 w-6 text-primary" />}
+          description="Active project spaces"
+          icon={<FolderKanban className="h-5 w-5 text-indigo-500" />}
+          badgeColor="bg-indigo-500/10"
         />
         <StatsCard
           title="AI Chats"
           value={chatCount}
           description="Conversations"
-          icon={<MessageSquare className="h-6 w-6 text-primary" />}
+          icon={<MessageSquare className="h-5 w-5 text-sky-500" />}
+          badgeColor="bg-sky-500/10"
         />
         <StatsCard
           title="Files"
           value={fileCount}
-          description="Uploaded files"
-          icon={<Files className="h-6 w-6 text-primary" />}
+          description="Uploaded documents"
+          icon={<Files className="h-5 w-5 text-emerald-500" />}
+          badgeColor="bg-emerald-500/10"
         />
         <StatsCard
           title="Storage"
           value={storageFormatted}
-          description="Storage used"
-          icon={<HardDrive className="h-6 w-6 text-primary" />}
+          description="Context storage used"
+          icon={<HardDrive className="h-5 w-5 text-amber-500" />}
+          badgeColor="bg-amber-500/10"
         />
       </div>
 
-      <div className="space-y-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-xl font-semibold tracking-tight text-foreground">
-            Recent Workspaces
-          </h2>
-          <p className="text-sm text-muted-foreground">
-            Manage your AI workspaces and recent activity.
-          </p>
-          <RecentWorkspaces workspaces={workspaces} />
-        </div>
-      </div>
+      {/* Recent Workspaces List */}
+      <RecentWorkspaces workspaces={workspaces} />
     </div>
   );
 }

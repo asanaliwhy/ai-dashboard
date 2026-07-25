@@ -59,12 +59,13 @@ export function ChatContainer({
 
   const formattedMessages = messages.map((m) => {
     let textContent = "";
-    if (m.parts && Array.isArray(m.parts)) {
+    if (m.parts && Array.isArray(m.parts) && m.parts.length > 0) {
       textContent = m.parts
         .filter((p: unknown) => (p as { type?: string }).type === "text")
         .map((p: unknown) => (p as { text?: string }).text || "")
         .join("");
-    } else if ("content" in m && typeof (m as { content?: unknown }).content === "string") {
+    }
+    if (!textContent && "content" in m && typeof (m as { content?: unknown }).content === "string") {
       textContent = (m as { content: string }).content;
     }
 

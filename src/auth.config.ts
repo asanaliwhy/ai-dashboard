@@ -29,15 +29,15 @@ export const authConfig = {
 
   authorized({ auth, request: { nextUrl } }) {
     const isLoggedIn = !!auth?.user;
-    const isOnDashboard = nextUrl.pathname.startsWith("/dashboard");
+    const protectedPaths = ["/dashboard", "/workspace", "/settings", "/profile", "/chat"];
+    const isProtectedRoute = protectedPaths.some((path) =>
+      nextUrl.pathname.startsWith(path)
+    );
 
-    if (isOnDashboard) {
+    if (isProtectedRoute) {
+      // Protected route: require login
       if (isLoggedIn) return true;
-      return false;
-    }
-
-    if (isLoggedIn) {
-      return Response.redirect(new URL("/dashboard", nextUrl));
+      return false; // redirects to signIn page (/login)
     }
 
     return true;

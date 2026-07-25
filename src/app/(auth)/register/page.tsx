@@ -1,7 +1,9 @@
 import { RegisterForm } from "@/components/auth/RegisterForm";
 
 export default function RegisterPage() {
-    return (
-        <RegisterForm/>
-    )
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-background p-4 md:p-8">
+      <RegisterForm />
+    </div>
+  );
 }

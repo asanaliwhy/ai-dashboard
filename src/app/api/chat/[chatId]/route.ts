@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { messageSchema } from "@/lib/chatMessageValidation";
 import { updateChatSchema } from "@/lib/chatValidation";
 import { models } from "@/lib/groq";
 import { streamText } from "ai";
@@ -27,14 +26,32 @@ export async function POST(
     }
 
     const { chatId } = await params;
-
     const body = await request.json();
 
-    const result = messageSchema.safeParse(body);
+    // Extract user content flexibly from any AI SDK format
+    let userContent = "";
 
-    if (!result.success) {
+    if (typeof body.text === "string" && body.text.trim()) {
+      userContent = body.text.trim();
+    } else if (typeof body.content === "string" && body.content.trim()) {
+      userContent = body.content.trim();
+    } else if (typeof body.prompt === "string" && body.prompt.trim()) {
+      userContent = body.prompt.trim();
+    } else if (Array.isArray(body.messages) && body.messages.length > 0) {
+      const lastMsg = body.messages[body.messages.length - 1];
+      if (typeof lastMsg.content === "string") {
+        userContent = lastMsg.content;
+      } else if (Array.isArray(lastMsg.parts)) {
+        userContent = lastMsg.parts
+          .filter((p: any) => p.type === "text")
+          .map((p: any) => p.text || "")
+          .join("");
+      }
+    }
+
+    if (!userContent) {
       return NextResponse.json(
-        { error: "Invalid message" },
+        { error: "Message text is required" },
         { status: 400 }
       );
     }
@@ -53,23 +70,18 @@ export async function POST(
       );
     }
 
-    const model = models[chat.aiModel as keyof typeof models];
+    const model = models[chat.aiModel as keyof typeof models] || models["Llama 3.3"];
 
-    if (!model) {
-      return NextResponse.json(
-        { error: "Invalid AI model" },
-        { status: 400 }
-      );
-    }
-
+    // Save the new user message in DB
     await prisma.message.create({
       data: {
         chatId,
         role: "USER",
-        content: result.data.content,
+        content: userContent,
       },
     });
 
+    // Retrieve full chat history from DB
     const history = await prisma.message.findMany({
       where: {
         chatId,
@@ -91,19 +103,21 @@ export async function POST(
       model,
       messages: aiMessages,
       onFinish: async ({ text }) => {
-        await prisma.message.create({
-          data: {
-            chatId,
-            role: "ASSISTANT",
-            content: text,
-          },
-        });
+        if (text && text.trim()) {
+          await prisma.message.create({
+            data: {
+              chatId,
+              role: "ASSISTANT",
+              content: text,
+            },
+          });
+        }
       },
     });
 
-    return streamResult.toTextStreamResponse();
+    return streamResult.toUIMessageStreamResponse();
   } catch (error) {
-    console.error(error);
+    console.error("POST chat message error:", error);
 
     return NextResponse.json(
       { error: "Failed to send message" },
